@@ -1,0 +1,95 @@
+/* Basics */
+
+*, *:before, *:after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+* + * {
+  margin-top: 1em;
+}
+
+:root {
+  box-sizing: border-box;
+  line-height: 1.5;
+  font-family: sans-serif;
+  font-size: calc(2vw + 2em);
+}
+
+/* Layout */
+body {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  background-color: black;
+  color: white;
+  /*background-image: url('30000-light-stripes.gif');
+  background-size: cover;
+  box-shadow: 0 0 10vmin black inset, 0 0 10vmin black inset;*/
+}
+
+main {
+  margin-top: 0;
+  perspective: 100vmin;
+  transform-style: preserve-3d;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Components */
+section {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 1em;
+  overflow: hidden;
+  transition: transform ease 1s, opacity ease 1s, visibility step-end 1s;
+  transform-origin: 50% 50%;
+  text-align: center;
+}
+
+[janus-timeline='past'] {
+}
+
+[janus-timeline='present'] {
+  transition: transform ease 1s, opacity ease 1s, visibility step-start 1s;
+}
+
+[janus-timeline='future'] {
+  visibility: hidden;
+}
+
+section[janus-timeline='past'] {
+  transform: translate3d(0, 0, 100vmin);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+section[janus-timeline='present'] {
+  transform: none;
+  opacity: 1;
+}
+
+section[janus-timeline='future'] {
+  transform: translate3d(0, 0, -25vmin);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+section.image > img {
+  position: absolute;
+  margin: 0;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
