@@ -6,6 +6,9 @@
   slideNext,
   slidePrev;
 
+  function $(selector) {
+    return document.querySelector(selector);
+  }
   function $$(selector){
     return Array.prototype.slice.call(document.querySelectorAll(selector), 0);
   }
@@ -25,6 +28,9 @@
   var init = function() {
     slides = $$('main>section');
     currentSlideNumber = 0;
+    shortcut.add('F1', function() {
+      document.body.classList.toggle('show-notes');
+    });
     shortcut.add('Page_down', function() {
       if (currentSlideNumber < slides.length - 1) {
         currentSlideNumber++;
