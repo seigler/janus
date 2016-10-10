@@ -17,6 +17,21 @@ li {
   list-style: none;
 }
 
+code {
+  font-family: Consolas, monaco, monospace;
+  border: 2px dashed currentcolor;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+h2 {
+  font-size: 1rem;
+}
+h1, h2 {
+  font-weight: bold;
+}
+
 /* Layout */
 body {
   display: flex;
@@ -61,16 +76,19 @@ section {
   transition: transform ease-out 0.5s, opacity ease-out 0.5s, visibility step-start 0.5s;
 }
 
-@media only screen {
-  [janus-timeline='future'] {
-    opacity: 0.5;
-  }
-}
-
 @media not print {
   [janus-timeline='future'] {
     visibility: hidden;
   }
+}
+
+body.show-notes section [janus-timeline='future'] {
+  visibility: visible;
+  opacity: 0.25;
+}
+
+body.show-notes section[janus-timeline='future'] [janus-timeline='future'] {
+  opacity: 1;
 }
 
 section[janus-timeline='past'] {
@@ -116,6 +134,6 @@ body.show-notes section[janus-timeline='present'] + section[janus-timeline='futu
   right: 0.4rem;
   opacity: 0.75;
   visibility: visible;
-  outline: 0.1rem solid white;
+  outline: 0.2rem solid white;
   z-index: 3;
 }

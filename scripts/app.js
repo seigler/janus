@@ -35,6 +35,7 @@
   }
 
   var sessionListener = function(e) {
+    console.log(e);
     if (e.url === window.location.href) {
       if (e.key === 'janus-currentSlideNumber') {
         setCurrentSlide(+e.newValue);
@@ -47,6 +48,9 @@
     currentSlideNumber = 0;
     shortcut.add('F1', function() {
       document.body.classList.toggle('show-notes');
+    });
+    shortcut.add('F2', function() {
+      window.open(window.location.href, '_blank');
     });
     shortcut.add('Page_down', function() {
       setCurrentSlide(currentSlideNumber + 1);
