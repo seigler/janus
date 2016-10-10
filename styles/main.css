@@ -13,6 +13,10 @@
   font-size: calc(2vw + 2em);
 }
 
+li {
+  list-style: none;
+}
+
 /* Layout */
 body {
   display: flex;
@@ -37,7 +41,7 @@ section {
   z-index: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: center;
   width: 100%;
   height: 100%;
   margin: 0;
@@ -45,15 +49,16 @@ section {
   overflow: hidden;
   text-align: center;
   background-color: black;
-  transition: transform ease 1s, opacity ease 1s, visibility step-end 1s;
+  transition: transform ease 0.5s, opacity ease 0.5s, visibility step-end 0.5s;
   transform-origin: 50% 50%;
 }
 
 [janus-timeline='past'] {
+  transition: transform ease-in 0.5s, opacity ease-in 0.5s, visibility step-end 0.5s;
 }
 
 [janus-timeline='present'] {
-  transition: transform ease 1s, opacity ease 1s, visibility step-start 1s;
+  transition: transform ease-out 0.5s, opacity ease-out 0.5s, visibility step-start 0.5s;
 }
 
 @media only screen {
@@ -88,7 +93,7 @@ section[janus-timeline='future'] {
   pointer-events: none;
 }
 
-section.image > img {
+img.cover {
   position: absolute;
   top: 0;
   left: 0;
@@ -98,15 +103,18 @@ section.image > img {
   z-index: -1;
 }
 
-body.show-notes section[janus-timeline='present'] + section[janus-timeline='future'] {
+body.show-notes section {
   transition: none;
+}
+
+body.show-notes section[janus-timeline='present'] + section[janus-timeline='future'] {
   transform: scale(0.25);
   transform-origin: bottom right;
   top: auto;
   left: auto;
   bottom: 0.4rem;
   right: 0.4rem;
-  opacity: 1;
+  opacity: 0.75;
   visibility: visible;
   outline: 0.1rem solid white;
   z-index: 3;
