@@ -112,6 +112,7 @@ nav > input {
   border: none;
   background: transparent;
   color: inherit;
+  outline: none;
 }
 
 nav > input:invalid {
