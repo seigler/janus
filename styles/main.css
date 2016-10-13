@@ -18,6 +18,10 @@ li {
 
 code {
   font-family: Consolas, monaco, monospace;
+}
+
+kbd {
+  font-family: Consolas, monaco, monospace;
   border: 2px dashed currentcolor;
 }
 
