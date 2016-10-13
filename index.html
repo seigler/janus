@@ -5,12 +5,32 @@
     <title>Janus Presentation Framework</title>
     <link rel="stylesheet" href="styles/main.css" charset="utf-8">
   </head>
-  <body>
+  <body class="is-loading">
+    <nav>
+      <label for="commandField">Command:</label>
+      <input list="commands" type="text" id="commandField" autocomplete="off" pattern="[0-9]+|[spc]">
+      <ul class="help">
+        <li>
+          <strong>#</strong> - jump to a slide item
+        </li>
+        <li>
+          <strong>s</strong> - toggle projector simulation
+        </li>
+        <li>
+          <strong>p</strong> - toggle presenter mode
+        </li>
+        <li>
+          <strong>c</strong> - clone window
+        </li>
+      </ul>
+    </nav>
     <main>
       <section style="background: linear-gradient(-30deg, black, rebeccapurple)">
         <h1>Janus Presentations</h1>
         <h2>Hotkey powered, multi-window presentations</h2>
-        <div>Press <code>Page Down</code> to continue.</div>
+        <div><small>
+          Press <code>Escape</code> for commands. <code>Page Up</code> / <code>Page Down</code> to navigate.
+        </small></div>
       </section>
       <section style="background: linear-gradient(-30deg, #400, black)">
         <h1>Hotkeys</h1>
@@ -24,7 +44,7 @@
           Toggle Presenter Mode: <code>F1</code>
         </div>
       </section>
-      <section style="text-shadow: 0 0 1em black;">
+      <section style="color: black">
         <img class="cover" src="https://placekitten.com/1024/768" alt="" />
         <h1>Self-scaling cover images with <code>object-fit</code></h1>
       </section>
@@ -47,7 +67,7 @@
         <h1>The end.</h1>
       </section>
     </main>
-    <script type="text/javascript" src="scripts/shortcut.js"></script>
+    <script type="text/javascript" src="libs/openjs-shortcut/shortcut.js"></script>
     <script type="text/javascript" src="scripts/app.js"></script>
   </body>
 </html>
