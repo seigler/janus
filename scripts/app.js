@@ -1,14 +1,20 @@
+/*jslint browser: true*/
+/*global shortcut*/
+
 (function () {
   'use strict';
 
   var slides = [],
-  currentSlideNumber = 0,
-  slideNext,
-  slidePrev,
-  commandBar,
-  commandField,
-  commandBarVisible = true;
+    syncFormElements = [],
+    currentSlideNumber = 0,
+    slideNext,
+    slidePrev,
+    commandBar,
+    commandField,
+    commandBarVisible = true,
+    localStorageActions;
 
+  /* Dom helper functions. Who needs JQuery?? */
   function $(selector) {
     return document.querySelector(selector);
   }
@@ -39,19 +45,17 @@
     });
   }
 
-  var sessionListener = function(e) {
-    if (e.url === window.location.href) {
-      if (e.key === 'janus-currentSlideNumber') {
-        setCurrentSlide(+e.newValue, false);
-      }
+  function sessionListener(event) {
+    if (event.url === window.location.href && localStorageActions[event.key]) {
+      localStorageActions[event.key](event);
     }
-  };
+  }
 
-  var toggleCommandBar = function() {
-    if (commandBarVisible) {
+  function toggleCommandBar(visible) {
+    if (visible === false) {
       commandBar.style.display = 'none';
       commandBarVisible = false;
-    } else {
+    } else if (visible === true) {
       commandBar.style.display = 'flex';
       commandField.value = '';
       commandField.focus();
@@ -59,70 +63,220 @@
     }
   }
 
-  var commandListener = function(event) {
+  function setMouseX(value, storeChange) {
+    $('section[janus-timeline="present"]').style.setProperty("--mouse-x", value);
+    if (storeChange) {
+      localStorage.setItem('mouse-x', value);
+    }
+  }
+
+  function mouseListener(event) {
+    var x = event.clientX / window.innerWidth;
+    if (event.ctrlKey) {
+      setMouseX(x, true);
+    }
+  }
+
+  function runCommand(command) {
+    var commands, s;
+    commands = {
+      's': function () {
+        document.body.classList.toggle('simulate-projection');
+      },
+      'p': function () {
+        document.body.classList.toggle('show-notes');
+      },
+      'c': function () {
+        window.open(window.location.href, '_blank');
+      },
+      'r': function () {
+        localStorage.clear();
+        setCurrentSlide(0, true);
+      }
+    };
+    s = command.split();
+    if (s.length === 1 && /^[0-9]+$/.test(s[0])) {
+      setCurrentSlide(+s[0], true);
+    } else if (s.length === 1 && commands[s]) {
+      commands[s]();
+    }
+  }
+
+  function commandListener(event) {
     var typed = String.fromCharCode(event.keyCode).toLowerCase();
-    console.log(event);
-    console.log(typed);
     if (/[0-9]/.test(typed)) {
       return;
     } else if (event.keyCode === 13) {
       runCommand(commandField.value);
-      toggleCommandBar();
-    } else if (/[spc]/.test(typed)) {
+      toggleCommandBar(false);
+    } else if (/[spcr]/.test(typed)) {
       runCommand(commandField.value + typed);
-      toggleCommandBar();
-    }
-  };
-
-  var runCommand = function(command) {
-    var s = command.split();
-    if (s.length === 1 && /^[0-9]+$/.test(s[0])) {
-      setCurrentSlide(+s[0], true);
-    } else if (s.length === 1) {
-      switch(s[0]) {
-        case 's':
-          document.body.classList.toggle('simulate-projection');
-          break;
-        case 'p':
-          document.body.classList.toggle('show-notes');
-          break;
-        case 'c':
-          window.open(window.location.href, '_blank');
-          break;
-      }
+      toggleCommandBar(false);
     }
   }
 
-  var init = function() {
+  function editorListenerGenerator(editor) {
+    var markupEl, styleEl, scriptEl, frameEl, frameWindow, listener;
+    markupEl = editor.querySelector('[name="html"]');
+    styleEl = editor.querySelector('[name="css"]');
+    scriptEl = editor.querySelector('[name="js"]');
+    frameEl = editor.querySelector('iframe');
+    if (frameEl.contentWindow) {
+      frameWindow = frameEl.contentWindow;
+    } else {
+      if (frameEl.contentDocument && frameEl.contentDocument.document) {
+        frameWindow = frameEl.contentDocument.document;
+      } else {
+        frameWindow = frameEl.contentDocument;
+      }
+    }
+    function editorAction() {
+      var compiled = '<!DOCTYPE html><html><head><style>' + styleEl.value + '</style></head><body>' + markupEl.value + '<scr' + 'ipt>' + scriptEl.value + '</scr' + 'ipt></body></html>';
+      frameWindow.document.open();
+      frameWindow.document.write(compiled);
+      frameWindow.document.close();
+//      frameEl.src = 'data:text/html;charset=utf-8,' + encodeURI(compiled);
+    }
+//    listener = function () {
+//      if (this.timeoutId) {
+//        window.clearTimeout(this.timeoutId);
+//      }
+//      this.timeoutId = window.setTimeout(editorAction, 100);
+//    };
+    [markupEl, styleEl, scriptEl].forEach(function (current, index, array) {
+      var syncFormElementsIndex = syncFormElements.indexOf(current);
+      current.addEventListener('keyup', editorAction);
+      if (syncFormElementsIndex >= 0) {
+        // add a listener to receive changes from localStorage
+        localStorageActions['janus-input-' + syncFormElementsIndex] = function (event) {
+          var storedValue = event.newValue,
+            decodedValue = storedValue.split('/', 2);
+          decodedValue.push(storedValue.slice(decodedValue.join(' ').length + 1));
+          current.value = decodedValue[2];
+          current.setSelectionRange(+decodedValue[0], +decodedValue[1]);
+          editorAction();
+          current.focus();
+        };
+      }
+    });
+    editorAction();
+  }
+
+  function init() {
+    var storedSlideNumber;
     commandField = $('#commandField');
     commandField.addEventListener('keydown', commandListener);
+    commandField.addEventListener('blur', function (event) {
+      toggleCommandBar(false);
+    });
     commandBar = $('body > nav');
-    toggleCommandBar();
+    toggleCommandBar(false);
 
     slides = $$('main>section, [janus-timeline]');
-    currentSlideNumber = 0;
-    shortcut.add('F1', function() {
-      document.body.classList.toggle('show-notes');
-    });
-    shortcut.add('F2', function() {
-      window.open(window.location.href, '_blank');
-    });
-    shortcut.add('Page_down', function() {
+    shortcut.add('Page_down', function () {
       setCurrentSlide(currentSlideNumber + 1, true);
     });
-    shortcut.add('Page_up', function() {
+    shortcut.add('Page_up', function () {
       setCurrentSlide(currentSlideNumber - 1, true);
     });
-    shortcut.add('Escape', toggleCommandBar);
-    var storedSlideNumber;
-    if (storedSlideNumber = localStorage.getItem('janus-currentSlideNumber')) {
+    shortcut.add('Escape', function () {
+      toggleCommandBar(!commandBarVisible);
+    });
+
+    storedSlideNumber = localStorage.getItem('janus-currentSlideNumber');
+    if (storedSlideNumber) {
       setCurrentSlide(storedSlideNumber, false);
     } else {
       setCurrentSlide(0);
     }
+
+    document.addEventListener('mousemove', mouseListener);
+
+    localStorageActions = {
+      'janus-currentSlideNumber': function (event) {
+        setCurrentSlide(+event.newValue, false);
+      },
+      'mouse-x' : function (event) {
+        setMouseX(event.newValue, false);
+      }
+    };
+
+    $$('[janus-sync]').forEach(function (current, index, array) {
+      var currentKey, storedValue, decodedValue, group;
+      syncFormElements.push(current);
+      if (current.type === 'textarea' || current.type === 'text') {
+        currentKey = 'janus-input-' + index;
+        storedValue = localStorage.getItem(currentKey);
+        if (storedValue) {
+          decodedValue = storedValue.split('/', 2);
+          decodedValue.push(storedValue.slice(decodedValue.join(' ').length + 1));
+          current.value = decodedValue[2];
+          current.setSelectionRange(+decodedValue[0], +decodedValue[1]);
+        } else {
+          localStorage.setItem(currentKey, '0/0/' + current.value);
+        }
+        // add a listener to store changes
+        current.addEventListener('keyup', function () {
+          localStorage.setItem(currentKey, current.selectionStart + '/' + current.selectionEnd + '/' + current.value);
+        });
+        // add a listener to respond to localStorage updates
+        if (!localStorageActions[currentKey]) {
+          localStorageActions[currentKey] = function (event) {
+            var storedValue = event.newValue,
+              decodedValue = storedValue.split('/', 2);
+            decodedValue.push(storedValue.slice(decodedValue.join(' ').length + 1));
+            current.value = decodedValue[2];
+            current.focus();
+            current.setSelectionRange(+decodedValue[0], +decodedValue[1]);
+          };
+        }
+      } else if (current.type === 'checkbox') {
+        currentKey = 'janus-input-' + index;
+        storedValue = localStorage.getItem(currentKey);
+        if (storedValue !== null) {
+          current.checked = (storedValue === 'true');
+        } else {
+          localStorage.setItem(currentKey, current.checked);
+        }
+        // add a listener to store changes
+        current.addEventListener('change', function () {
+          localStorage.setItem(currentKey, current.checked);
+        });
+        // add a listener to respond to localStorage updates
+        if (!localStorageActions[currentKey]) {
+          localStorageActions[currentKey] = function (event) {
+            current.checked = (event.newValue === 'true');
+          };
+        }
+      } else if (current.type === 'radio') {
+        group = current.getAttribute('name');
+        currentKey = 'janus-input-' + group;
+        storedValue = localStorage.getItem(currentKey);
+        if (storedValue !== null && +storedValue === index) {
+          current.checked = true;
+        } else if (current.checked) {
+          localStorage.setItem(currentKey, index);
+        }
+        // add a listener to store changes
+        current.addEventListener('change', function () {
+          localStorage.setItem(currentKey, index);
+        });
+        // add a listener to respond to localStorage updates
+        if (!localStorageActions[currentKey]) {
+          localStorageActions[currentKey] = function (event) {
+            syncFormElements[+event.newValue].checked = true;
+          };
+        }
+      }
+    });
+
+    $$('.live-coding').forEach(function (current, index, array) {
+      editorListenerGenerator(current);
+    });
+
     document.body.classList.remove('is-loading');
-  };
+  }
 
   document.addEventListener('DOMContentLoaded', init);
   window.addEventListener('storage', sessionListener);
-})();
+}());

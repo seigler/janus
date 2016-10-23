@@ -2,13 +2,14 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Janus Presentation Framework</title>
+    <title>Tech Talk: Responsive Typography</title>
     <link rel="stylesheet" href="styles/main.css" charset="utf-8">
+    <script type="text/javascript" src="libs/prefixfree/prefixfree.min.js"></script>
   </head>
   <body class="is-loading">
     <nav>
       <label for="commandField">Command:</label>
-      <input list="commands" type="text" id="commandField" autocomplete="off" pattern="[0-9]+|[spc]">
+      <input list="commands" type="text" id="commandField" autocomplete="off" pattern="[0-9]+|[spcr]">
       <ul class="help">
         <li>
           <strong>#</strong> - jump to a slide item
@@ -22,56 +23,118 @@
         <li>
           <strong>c</strong> - clone window
         </li>
+        <li>
+          <strong>r</strong> - reset stored state
+        </li>
       </ul>
     </nav>
     <main>
 
-      <section style="background: linear-gradient(-30deg, black, rebeccapurple)">
-        <h1>Janus Presentations</h1>
-        <h2>Hotkey powered, multi-window presentations</h2>
-        <div><small>
-          Press <kbd>Escape</kbd> for commands. <kbd>Page Up</kbd> / <kbd>Page Down</kbd> to navigate.
-        </small></div>
-        <div><a href="https://github.com/seigler/janus">Get the code on GitHub</a></div>
-      </section>
-
-      <section style="background: linear-gradient(-30deg, #400, black)">
-        <h1>Hotkeys</h1>
-        <div janus-timeline>
-          Clone Window: <kbd>F2</kbd>
-        </div>
-        <div janus-timeline>
-          Navigation: <kbd>Page Down</kbd>, <kbd>Page Up</kbd>
-        </div>
-        <div janus-timeline>
-          Toggle Presenter Mode: <kbd>F1</kbd>
-        </div>
-      </section>
-
-      <section style="color: black">
-        <img class="cover" src="https://placekitten.com/1024/768" alt="" />
-        <h1>Self-scaling cover images with <code>object-fit</code></h1>
-      </section>
-      <section style="background: linear-gradient(60deg, #060, black)">
-        <h1>Simple default markup</h1>
-        <div>
-          Any <code>section</code> tag or item with attribute <code>janus-timeline</code> is added to the timeline and revealed in sequence.
-        </div>
-      </section>
-
-      <section style="background: linear-gradient(-60deg, black, #630)">
-        <h1>Animations controlled by CSS</h1>
-        <div>
-          Framework sets custom attribute <code>janus-timeline</code> to <code>past</code>, <code>present</code>, or <code>future</code>
-        </div>
-      </section>
-
-      <section style="color: black; background-color: #FA0">
-        <h1>Cross-window synchronization with JavaScript <code>localStorage</code> events.</h1>
+      <section class="title-page" style="background: linear-gradient(to bottom, black 30%, rebeccapurple)">
+        <h1 style="font-size: 3.2em">Janus</h1>
+        <h2>A live-coding web presentation framework.</h2>
+        <p><kbd>Page Down</kbd> to continue</p>
+        <p><kbd>Esc</kbd> for commands</p>
       </section>
 
       <section>
-        <h1>The end.</h1>
+        <blockquote>
+          <p>Blockquotes are pretty cool, right?</p>
+          <cite>Thomas Jefferson, probably</cite>
+        </blockquote>
+      </section>
+
+      <section id="demo1" style="--mouse-x: 0.5">
+        <div class="live-coding col" style="justify-content: center;">
+          <div class="browser" style="max-width: calc(100vw * var(--mouse-x)); min-width: 2em; margin-bottom: 0.2em;">
+            <iframe src="about:blank" frameborder="0"></iframe>
+          </div>
+          <div class="row" style="min-height: 50%">
+            <input type="radio" id="demo1-markup" name="demo1" janus-sync>
+            <div class="live-coding__component" style="--theme-color: #E34F26;">
+              <label for="demo1-markup">HTML</label>
+              <textarea name="html" cols="1" id="demo1-html" spellcheck="false" janus-sync>
+<nav>
+  <a href="#">Home</a>
+  <a href="#">Shop</a>
+  <a href="#">Blog</a>
+  <a href="#">About</a>
+</nav>
+<div class="content">
+  <div class="sidebar">Ads ads ads ads</div>
+  <main>
+    <section>Content content content</section>
+    <section>Content content content</section>
+    <section>Content content content</section>
+    <section>Content content content</section>
+  </main>
+</div>
+<footer>&copy; by us, forever. Neener neener.</footer>
+</textarea>
+            </div>
+            <input type="radio" id="demo1-styles" name="demo1" checked janus-sync>
+            <div class="live-coding__component" style="--theme-color: #0070BA;">
+              <label for="demo1-styles">CSS</label>
+<textarea name="css" cols="1" id="demo1-css" spellcheck="false" janus-sync>* { margin: 0; padding: 0; box-size: border-box; }
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  font-size: calc(1vw + 1em);
+  height: 100vh;
+}
+nav {
+  display: flex;
+  margin-bottom: -0.1em;
+  flex-wrap: wrap;
+}
+nav > a {
+  flex: 1 1 auto;
+  max-width: 7em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 0.5em;
+  text-align: center;
+  white-space: nowrap;
+  border: 0.1em solid black;
+}
+nav > a + a {
+  margin-left: -0.1em;
+}
+.content {
+  display: flex;
+  flex-grow: 1;
+}
+.sidebar {
+  width: 7em;
+  order: 1;
+  border: 0.1em solid;
+}
+main {
+  flex-grow: 1;
+}
+section {
+  min-height: 3em;
+  border: solid;
+  border-width: 0.1em 0;
+}
+section + section {
+  margin-top: -0.1em;
+}
+</textarea>
+            </div>
+            <input type="radio" id="demo1-script" name="demo1" janus-sync>
+            <div class="live-coding__component" style="--theme-color: #F7DF1E;">
+              <label for="demo1-script">JS</label>
+<textarea name="js" cols="1" id="demo1-js" spellcheck="false" janus-sync>// no JS needed
+</textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h1>The End</h1>
       </section>
 
     </main>
