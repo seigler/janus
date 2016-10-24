@@ -138,32 +138,6 @@
     }
     [markupEl, styleEl, scriptEl].forEach(function (current, index, array) {
       var syncFormElementsIndex = syncFormElements.indexOf(current), editor;
-//      // add a listener to do indenting
-//      current.addEventListener('keydown', function(event) {
-//        var initialScroll, beforeCursor, inSelection, afterCursor, selectionMin, selectionMax, replacedText;
-//        beforeCursor = current.value.slice(0, selectionMin);
-//        inSelection = current.value.slice(selectionMin, selectionMax);
-//        afterCursor = current.value.slice(selectionMax);
-//        initialScroll = current.scrollTop;
-//        if (event.keyCode === 13) {
-//          // NEWLINE
-//          event.preventDefault();
-//          replacedText = "\n";
-//          document.execCommand("insertText", false, replacedText);
-//          selectionMin += replacedText.length;
-//          selectionMax = selectionMin;
-//          current.scrollTop = initialScroll;
-//        } else if (event.keyCode === 9) {
-//          // TAB
-//          event.preventDefault();
-//          event.stopPropagation();
-//          replacedText = "\t";
-//          document.execCommand("insertText", false, replacedText);
-//          selectionMin += replacedText.length;
-//          selectionMax = selectionMin;
-//          current.scrollTop = initialScroll;
-//        }
-//      });
       editor = new Behave({
         textarea: current,
         replaceTab: true,
