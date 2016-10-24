@@ -1,8 +1,8 @@
 /*jslint browser: true*/
-/*global shortcut*/
+/*global shortcut, Behave*/
 
 (function () {
-  'use strict';
+  "use strict";
 
   var slides = [],
     syncFormElements = [],
@@ -27,20 +27,20 @@
     if (newSlideNumber !== currentSlideNumber) {
       currentSlideNumber = newSlideNumber;
       if (storeChange) {
-        localStorage.setItem('janus-currentSlideNumber', currentSlideNumber);
+        localStorage.setItem("janus-currentSlideNumber", currentSlideNumber);
       }
     }
     slides.forEach(function (item, index, array) {
       if (index < currentSlideNumber) {
         if (slides[index].contains(slides[currentSlideNumber])) {
-          item.setAttribute('janus-timeline', 'present');
+          item.setAttribute("janus-timeline", "present");
         } else {
-          item.setAttribute('janus-timeline', 'past');
+          item.setAttribute("janus-timeline", "past");
         }
       } else if (index === currentSlideNumber) {
-        item.setAttribute('janus-timeline', 'present');
+        item.setAttribute("janus-timeline", "present");
       } else {
-        item.setAttribute('janus-timeline', 'future');
+        item.setAttribute("janus-timeline", "future");
       }
     });
   }
@@ -53,20 +53,20 @@
 
   function toggleCommandBar(visible) {
     if (visible === false) {
-      commandBar.style.display = 'none';
+      commandBar.style.display = "none";
       commandBarVisible = false;
     } else if (visible === true) {
-      commandBar.style.display = 'flex';
-      commandField.value = '';
+      commandBar.style.display = "flex";
+      commandField.value = "";
       commandField.focus();
       commandBarVisible = true;
     }
   }
 
   function setMouseX(value, storeChange) {
-    $('section[janus-timeline="present"]').style.setProperty("--mouse-x", value);
+    $("section[janus-timeline=\"present\"]").style.setProperty("--mouse-x", value);
     if (storeChange) {
-      localStorage.setItem('mouse-x', value);
+      localStorage.setItem("mouse-x", value);
     }
   }
 
@@ -80,16 +80,16 @@
   function runCommand(command) {
     var commands, s;
     commands = {
-      's': function () {
-        document.body.classList.toggle('simulate-projection');
+      "s": function () {
+        document.body.classList.toggle("simulate-projection");
       },
-      'p': function () {
-        document.body.classList.toggle('show-notes');
+      "p": function () {
+        document.body.classList.toggle("show-notes");
       },
-      'c': function () {
-        window.open(window.location.href, '_blank');
+      "c": function () {
+        window.open(window.location.href, "_blank");
       },
-      'r': function () {
+      "r": function () {
         localStorage.clear();
         setCurrentSlide(0, true);
       }
@@ -117,10 +117,10 @@
 
   function editorListenerGenerator(editor) {
     var markupEl, styleEl, scriptEl, frameEl, frameWindow, listener;
-    markupEl = editor.querySelector('[name="html"]');
-    styleEl = editor.querySelector('[name="css"]');
-    scriptEl = editor.querySelector('[name="js"]');
-    frameEl = editor.querySelector('iframe');
+    markupEl = editor.querySelector("[name=\"html\"]");
+    styleEl = editor.querySelector("[name=\"css\"]");
+    scriptEl = editor.querySelector("[name=\"js\"]");
+    frameEl = editor.querySelector("iframe");
     if (frameEl.contentWindow) {
       frameWindow = frameEl.contentWindow;
     } else {
@@ -131,27 +131,58 @@
       }
     }
     function editorAction() {
-      var compiled = '<!DOCTYPE html><html><head><style>' + styleEl.value + '</style></head><body>' + markupEl.value + '<scr' + 'ipt>' + scriptEl.value + '</scr' + 'ipt></body></html>';
+      var compiled = "<!DOCTYPE html><html><head><style>" + styleEl.value + "</style></head><body>" + markupEl.value + "<scr" + "ipt>" + scriptEl.value + "</scr" + "ipt></body></html>";
       frameWindow.document.open();
       frameWindow.document.write(compiled);
       frameWindow.document.close();
-//      frameEl.src = 'data:text/html;charset=utf-8,' + encodeURI(compiled);
     }
-//    listener = function () {
-//      if (this.timeoutId) {
-//        window.clearTimeout(this.timeoutId);
-//      }
-//      this.timeoutId = window.setTimeout(editorAction, 100);
-//    };
     [markupEl, styleEl, scriptEl].forEach(function (current, index, array) {
-      var syncFormElementsIndex = syncFormElements.indexOf(current);
-      current.addEventListener('keyup', editorAction);
+      var syncFormElementsIndex = syncFormElements.indexOf(current), editor;
+//      // add a listener to do indenting
+//      current.addEventListener('keydown', function(event) {
+//        var initialScroll, beforeCursor, inSelection, afterCursor, selectionMin, selectionMax, replacedText;
+//        beforeCursor = current.value.slice(0, selectionMin);
+//        inSelection = current.value.slice(selectionMin, selectionMax);
+//        afterCursor = current.value.slice(selectionMax);
+//        initialScroll = current.scrollTop;
+//        if (event.keyCode === 13) {
+//          // NEWLINE
+//          event.preventDefault();
+//          replacedText = "\n";
+//          document.execCommand("insertText", false, replacedText);
+//          selectionMin += replacedText.length;
+//          selectionMax = selectionMin;
+//          current.scrollTop = initialScroll;
+//        } else if (event.keyCode === 9) {
+//          // TAB
+//          event.preventDefault();
+//          event.stopPropagation();
+//          replacedText = "\t";
+//          document.execCommand("insertText", false, replacedText);
+//          selectionMin += replacedText.length;
+//          selectionMax = selectionMin;
+//          current.scrollTop = initialScroll;
+//        }
+//      });
+      editor = new Behave({
+        textarea: current,
+        replaceTab: true,
+        softTabs: true,
+        tabSize: 2,
+        autoOpen: true,
+        overwrite: true,
+        autoStrip: true,
+        autoIndent: true,
+        fence: false
+      });
+      // add a listener to build the source when the fields are changed
+      current.addEventListener('input', editorAction);
       if (syncFormElementsIndex >= 0) {
         // add a listener to receive changes from localStorage
-        localStorageActions['janus-input-' + syncFormElementsIndex] = function (event) {
+        localStorageActions["janus-input-" + syncFormElementsIndex] = function (event) {
           var storedValue = event.newValue,
-            decodedValue = storedValue.split('/', 2);
-          decodedValue.push(storedValue.slice(decodedValue.join(' ').length + 1));
+            decodedValue = storedValue.split("/", 2);
+          decodedValue.push(storedValue.slice(decodedValue.join(" ").length + 1));
           current.value = decodedValue[2];
           current.setSelectionRange(+decodedValue[0], +decodedValue[1]);
           editorAction();
@@ -164,93 +195,93 @@
 
   function init() {
     var storedSlideNumber;
-    commandField = $('#commandField');
-    commandField.addEventListener('keydown', commandListener);
-    commandField.addEventListener('blur', function (event) {
+    commandField = $("#commandField");
+    commandField.addEventListener("keydown", commandListener);
+    commandField.addEventListener("blur", function (event) {
       toggleCommandBar(false);
     });
-    commandBar = $('body > nav');
+    commandBar = $("body > nav");
     toggleCommandBar(false);
 
-    slides = $$('main>section, [janus-timeline]');
-    shortcut.add('Page_down', function () {
+    slides = $$("main>section, [janus-timeline]");
+    shortcut.add("Page_down", function () {
       setCurrentSlide(currentSlideNumber + 1, true);
     });
-    shortcut.add('Page_up', function () {
+    shortcut.add("Page_up", function () {
       setCurrentSlide(currentSlideNumber - 1, true);
     });
-    shortcut.add('Escape', function () {
+    shortcut.add("Escape", function () {
       toggleCommandBar(!commandBarVisible);
     });
 
-    storedSlideNumber = localStorage.getItem('janus-currentSlideNumber');
+    storedSlideNumber = localStorage.getItem("janus-currentSlideNumber");
     if (storedSlideNumber) {
       setCurrentSlide(storedSlideNumber, false);
     } else {
       setCurrentSlide(0);
     }
 
-    document.addEventListener('mousemove', mouseListener);
+    document.addEventListener("mousemove", mouseListener);
 
     localStorageActions = {
-      'janus-currentSlideNumber': function (event) {
+      "janus-currentSlideNumber": function (event) {
         setCurrentSlide(+event.newValue, false);
       },
-      'mouse-x' : function (event) {
+      "mouse-x" : function (event) {
         setMouseX(event.newValue, false);
       }
     };
 
-    $$('[janus-sync]').forEach(function (current, index, array) {
-      var currentKey, storedValue, decodedValue, group;
+    $$("[janus-sync]").forEach(function (current, index, array) {
+      var currentKey, storedValue, decodedValue, group, replacedText;
       syncFormElements.push(current);
-      if (current.type === 'textarea' || current.type === 'text') {
-        currentKey = 'janus-input-' + index;
+      if (current.type === "textarea" || current.type === "text") {
+        currentKey = "janus-input-" + index;
         storedValue = localStorage.getItem(currentKey);
         if (storedValue) {
-          decodedValue = storedValue.split('/', 2);
-          decodedValue.push(storedValue.slice(decodedValue.join(' ').length + 1));
+          decodedValue = storedValue.split("/", 2);
+          decodedValue.push(storedValue.slice(decodedValue.join(" ").length + 1));
           current.value = decodedValue[2];
           current.setSelectionRange(+decodedValue[0], +decodedValue[1]);
         } else {
-          localStorage.setItem(currentKey, '0/0/' + current.value);
+          localStorage.setItem(currentKey, "0/0/" + current.value);
         }
         // add a listener to store changes
-        current.addEventListener('keyup', function () {
-          localStorage.setItem(currentKey, current.selectionStart + '/' + current.selectionEnd + '/' + current.value);
+        current.addEventListener("keyup", function (event) {
+          localStorage.setItem(currentKey, current.selectionStart + "/" + current.selectionEnd + "/" + current.value);
         });
         // add a listener to respond to localStorage updates
         if (!localStorageActions[currentKey]) {
           localStorageActions[currentKey] = function (event) {
             var storedValue = event.newValue,
-              decodedValue = storedValue.split('/', 2);
-            decodedValue.push(storedValue.slice(decodedValue.join(' ').length + 1));
+              decodedValue = storedValue.split("/", 2);
+            decodedValue.push(storedValue.slice(decodedValue.join(" ").length + 1));
             current.value = decodedValue[2];
             current.focus();
             current.setSelectionRange(+decodedValue[0], +decodedValue[1]);
           };
         }
-      } else if (current.type === 'checkbox') {
-        currentKey = 'janus-input-' + index;
+      } else if (current.type === "checkbox") {
+        currentKey = "janus-input-" + index;
         storedValue = localStorage.getItem(currentKey);
         if (storedValue !== null) {
-          current.checked = (storedValue === 'true');
+          current.checked = (storedValue === "true");
         } else {
           localStorage.setItem(currentKey, current.checked);
         }
         // add a listener to store changes
-        current.addEventListener('change', function () {
+        current.addEventListener("change", function (event) {
           localStorage.setItem(currentKey, current.checked);
         });
         // add a listener to respond to localStorage updates
         if (!localStorageActions[currentKey]) {
           localStorageActions[currentKey] = function (event) {
-            current.checked = (event.newValue === 'true');
+            current.checked = (event.newValue === "true");
           };
         }
-      } else if (current.type === 'radio') {
-        group = current.getAttribute('name');
-        currentKey = 'janus-input-' + group;
+      } else if (current.type === "radio") {
+        group = current.getAttribute("name");
+        currentKey = "janus-input-" + group;
         storedValue = localStorage.getItem(currentKey);
         if (storedValue !== null && +storedValue === index) {
           current.checked = true;
@@ -258,7 +289,7 @@
           localStorage.setItem(currentKey, index);
         }
         // add a listener to store changes
-        current.addEventListener('change', function () {
+        current.addEventListener("change", function () {
           localStorage.setItem(currentKey, index);
         });
         // add a listener to respond to localStorage updates
@@ -270,13 +301,13 @@
       }
     });
 
-    $$('.live-coding').forEach(function (current, index, array) {
+    $$(".live-coding").forEach(function (current, index, array) {
       editorListenerGenerator(current);
     });
 
-    document.body.classList.remove('is-loading');
+    document.body.classList.remove("is-loading");
   }
 
-  document.addEventListener('DOMContentLoaded', init);
-  window.addEventListener('storage', sessionListener);
+  document.addEventListener("DOMContentLoaded", init);
+  window.addEventListener("storage", sessionListener);
 }());
