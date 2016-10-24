@@ -2,6 +2,8 @@
 
 This is a browser-based presentation framework with two connected views: one for the presenter, and one for the audience.
 
+[See it in action!](https://seigler.github.io/janus)
+
 ## Features:
 
 * Presenter view and presentation view, connected through Localstorage
