@@ -18,3 +18,5 @@ After you have edited index.html to your liking, you can run `npm run build` to 
 ## Gotchas:
 
 Firefox and Chrome handle `file:///` urls differently. In Firefox, local files are allowed to interact with LocalStorage, but on Chrome they are not. To circumvent this issue in Chrome, you have to serve the file on `localhost` with `npm run start` or some other local server.
+
+Currently the live editor completely blows up in Firefox. I think it's related to a flexbox bug?
