@@ -279,7 +279,6 @@ section {
 
 .live-coding__code textarea {
   background: #333;
-  -webkit-text-stroke: 2px #333;
 }
 
 .live-coding__code .highlight {
@@ -289,7 +288,6 @@ section {
 .live-coding__code textarea::selection {
   background-color: black;
   color: transparent;
-  -webkit-text-stroke: none;
 }
 
 .live-coding__component {
