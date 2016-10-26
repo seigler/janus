@@ -9,7 +9,7 @@
 :root {
   --main-font: sans-serif;
   --monospace-font: monospace;
-  --mouse-x: 100vw;
+  --mouse-x: 0.5;
 
   box-sizing: border-box;
   font-family: var(--main-font);
@@ -59,7 +59,6 @@ textarea {
   font-family: monospace;
   font-family: var(--monospace-font, monospace);
   font-size: 0.5em;
-  height: 100%;
 }
 
 h1 {
@@ -253,20 +252,43 @@ section {
   flex: 1 1 100%;
 }
 
-.live-coding textarea {
-  font-size: 0.5em;
-  resize: none;
-  flex: 1 1 auto;
-  color: white;
-  background: #333;
-  border: none;
-  padding: 0.1em;
-  outline: none;
+.live-coding__code {
+  position: relative;
+  width: 100%;
 }
 
-.live-coding textarea::selection {
+.live-coding__code textarea, .live-coding__code .highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0.1em;
+  font-size: 0.4em;
+  resize: none;
+  color: white;
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: auto;
+  border: none;
+  outline: none;
+  text-align: left;
+  line-height: 1.1;
+}
+
+.live-coding__code textarea {
+  background: #333;
+  -webkit-text-stroke: 2px #333;
+}
+
+.live-coding__code .highlight {
+  pointer-events: none;
+}
+
+.live-coding__code textarea::selection {
   background-color: black;
-  color: var(--theme-color, white);
+  color: transparent;
 }
 
 .live-coding__component {
@@ -286,8 +308,8 @@ section {
 .hidden,
 .live-coding input[type="radio"],
 .live-coding input[type="checkbox"],
-.live-coding input[type="radio"]:not(:checked) + .live-coding__component > textarea,
-.live-coding input[type="checkbox"]:not(:checked) + .live-coding__component > textarea {
+.live-coding input[type="radio"]:not(:checked) + .live-coding__component > .live-coding__code,
+.live-coding input[type="checkbox"]:not(:checked) + .live-coding__component > .live-coding__code {
   position: fixed;
   visibility: hidden;
   right: 110vw;

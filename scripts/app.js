@@ -1,5 +1,5 @@
 /*jslint browser: true*/
-/*global shortcut, Behave*/
+/*global shortcut, Behave, hljs*/
 
 (function () {
   "use strict";
@@ -116,11 +116,18 @@
   }
 
   function editorListenerGenerator(editor) {
-    var markupEl, styleEl, scriptEl, frameEl, frameWindow, listener;
-    markupEl = editor.querySelector("[name=\"html\"]");
-    styleEl = editor.querySelector("[name=\"css\"]");
-    scriptEl = editor.querySelector("[name=\"js\"]");
-    frameEl = editor.querySelector("iframe");
+    var frameWindow, listener,
+      textareas = [
+        editor.querySelector("[name=\"html\"]"),
+        editor.querySelector("[name=\"css\"]"),
+        editor.querySelector("[name=\"js\"]")
+      ],
+      highlights = [
+        editor.querySelector("[name=\"html\"] + .highlight"),
+        editor.querySelector("[name=\"css\"] + .highlight"),
+        editor.querySelector("[name=\"js\"] + .highlight")
+      ],
+      frameEl = editor.querySelector("iframe");
     if (frameEl.contentWindow) {
       frameWindow = frameEl.contentWindow;
     } else {
@@ -131,12 +138,15 @@
       }
     }
     function editorAction() {
-      var compiled = "<!DOCTYPE html><html><head><style>" + styleEl.value + "</style></head><body>" + markupEl.value + "<scr" + "ipt>" + scriptEl.value + "</scr" + "ipt></body></html>";
+      var compiled = "<!DOCTYPE html><html><head><style>" + textareas[1].value + "</style></head><body>" + textareas[0].value + "<scr" + "ipt>" + textareas[2].value + "</scr" + "ipt></body></html>";
       frameWindow.document.open();
       frameWindow.document.write(compiled);
       frameWindow.document.close();
+      textareas.forEach(function (current, index, array) {
+        highlights[index].innerHTML = hljs.highlight(["html", "css", "js"][index], current.value + "\n", true).value;
+      });
     }
-    [markupEl, styleEl, scriptEl].forEach(function (current, index, array) {
+    textareas.forEach(function (current, index, array) {
       var syncFormElementsIndex = syncFormElements.indexOf(current), editor;
       editor = new Behave({
         textarea: current,
@@ -151,8 +161,14 @@
       });
       // add a listener to build the source when the fields are changed
       current.addEventListener('input', editorAction);
+      current.addEventListener('keydown', editorAction);
+      // add a listener to sync the highlight element and the textarea
+      current.addEventListener('scroll', function (event) {
+        highlights[index].scrollTop = current.scrollTop;
+        highlights[index].scrollLeft = current.scrollLeft;
+      }, { passive: true });
+      // add a listener to receive changes from localStorage
       if (syncFormElementsIndex >= 0) {
-        // add a listener to receive changes from localStorage
         localStorageActions["janus-input-" + syncFormElementsIndex] = function (event) {
           var storedValue = event.newValue,
             decodedValue = storedValue.split("/", 2);

@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>Tech Talk: Responsive Typography</title>
+    <link rel="stylesheet" href="libs/highlight.js/monokai-sublime.css">
     <link rel="stylesheet" href="styles/main.css" charset="utf-8">
     <script type="text/javascript" src="libs/prefixfree/prefixfree.min.js"></script>
   </head>
@@ -44,7 +45,7 @@
         </blockquote>
       </section>
 
-      <section id="demo1" style="--mouse-x: 0.5">
+      <section id="demo1">
         <div class="live-coding col" style="justify-content: center;">
           <div class="browser" style="max-width: calc(100vw * var(--mouse-x)); min-width: 2em; margin-bottom: 0.2em;">
             <iframe src="about:blank" frameborder="0"></iframe>
@@ -53,7 +54,8 @@
             <input type="radio" id="demo1-markup" name="demo1" janus-sync>
             <div class="live-coding__component" style="--theme-color: #E34F26;">
               <label for="demo1-markup">HTML</label>
-              <textarea name="html" cols="1" id="demo1-html" spellcheck="false" janus-sync>
+                <div class="live-coding__code">
+<textarea name="html" cols="1" id="demo1-html" spellcheck="false" janus-sync>
 <nav>
   <a href="#">Home</a>
   <a href="#">Shop</a>
@@ -71,10 +73,13 @@
 </div>
 <footer>&copy; by us, forever. Neener neener.</footer>
 </textarea>
+              <div class="highlight"></div>
+              </div>
             </div>
             <input type="radio" id="demo1-styles" name="demo1" checked janus-sync>
             <div class="live-coding__component" style="--theme-color: #0070BA;">
               <label for="demo1-styles">CSS</label>
+              <div class="live-coding__code">
 <textarea name="css" cols="1" id="demo1-css" spellcheck="false" janus-sync>* { margin: 0; padding: 0; box-size: border-box; }
 body {
   display: flex;
@@ -122,12 +127,17 @@ section + section {
   margin-top: -0.1em;
 }
 </textarea>
+              <div class="highlight"></div>
+              </div>
             </div>
             <input type="radio" id="demo1-script" name="demo1" janus-sync>
             <div class="live-coding__component" style="--theme-color: #F7DF1E;">
               <label for="demo1-script">JS</label>
+              <div class="live-coding__code">
 <textarea name="js" cols="1" id="demo1-js" spellcheck="false" janus-sync>// no JS needed
 </textarea>
+              <div class="highlight"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -140,6 +150,7 @@ section + section {
     </main>
     <script type="text/javascript" src="libs/openjs-shortcut/shortcut.js"></script>
     <script type="text/javascript" src="libs/behave/behave.js"></script>
+    <script type="text/javascript" src="libs/highlight.js/highlight.min.js"></script>
     <script type="text/javascript" src="scripts/app.js"></script>
   </body>
 </html>
